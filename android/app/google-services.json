@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "422017441655",
+    "project_id": "m-finder-34",
+    "storage_bucket": "m-finder-34.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422017441655:android:0fd2a1e8d2190433524b72",
+        "android_client_info": {
+          "package_name": "com.orvil.movie_finder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "422017441655-1afimmjql2h67siioevhi9gfpnbvej09.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.orvil.movie_finder",
+            "certificate_hash": "6de22acba7d5c20af0892ad4a3a9cf31c7e6818f"
+          }
+        },
+        {
+          "client_id": "422017441655-sanr81dv6fhnluu46pa2l1idj92n1b42.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeJPCJ3OH_vcFp2YlaCTmD7oNh1wPp0CM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "422017441655-sanr81dv6fhnluu46pa2l1idj92n1b42.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
