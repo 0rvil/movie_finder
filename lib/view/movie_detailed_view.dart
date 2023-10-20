@@ -14,7 +14,7 @@ class MovieDetailedView extends StatefulWidget{
 }
 
 class _MovieDetailedViewState extends State<MovieDetailedView>{
-  MovieDetailedBloc _bloc;
+  late MovieDetailedBloc _bloc;
 
   @override
   void initState(){
@@ -34,19 +34,18 @@ class _MovieDetailedViewState extends State<MovieDetailedView>{
         child: StreamBuilder<Response<MovieDetailedResponse>>(
           stream: _bloc.detailedDataStream,
           builder: (context,snapshot){
-            if(snapshot.hasData){
-              switch (snapshot.data.status){
+            if(snapshot.hasData && snapshot.data != null){
+              switch (snapshot.data!.status){
                 case Status.LOADING:
-                  return Loading(loadingMessage: snapshot.data.message);
-                  break;
+                  return Loading(loadingMessage: snapshot.data!.message!);
                 case Status.COMPLETED:
-                  return MovieCard(movieResponse: snapshot.data.data);
-                  break;
+                  return MovieCard(movieResponse: snapshot.data!.data!);
                 case Status.ERROR:
-                  return Error(errorMessage: snapshot.data.message,
-                    onRetryPressed: ()=> _bloc.fetchMovieDetails(widget.selectedMovie),
+                  return Error(errorMessage: snapshot.data!.message!,
+                    onRetryPressed: () async {
+                     await _bloc.fetchMovieDetails(widget.selectedMovie);
+                     },
                   );
-                  break;
               }
             }
             return Container();
@@ -64,7 +63,7 @@ class _MovieDetailedViewState extends State<MovieDetailedView>{
 
 class MovieCard extends StatefulWidget{
   final MovieDetailedResponse movieResponse;
-  const MovieCard({Key key, this.movieResponse}): super(key:key);
+  const MovieCard({required this.movieResponse});
 
   @override
   _MovieCardState createState() => _MovieCardState();
@@ -88,8 +87,8 @@ class _MovieCardState extends State<MovieCard>{
               child: Column(
                 children: [
                   ListTile(
-                    title:Text(widget.movieResponse.title),
-                    subtitle: Text(widget.movieResponse.releaseDate),
+                    title:Text(widget.movieResponse.title ?? ''),
+                    subtitle: Text(widget.movieResponse.releaseDate ?? 'Unknown'),
                   ),
                   Image.network('https://image.tmdb.org/t/p/w342${widget.movieResponse.posterPath}'),
                   ButtonBar(
@@ -117,7 +116,7 @@ class _MovieCardState extends State<MovieCard>{
                   ),
                   Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: Text(widget.movieResponse.overview,),
+                    child: Text(widget.movieResponse.overview ?? ''),
                   ),
                 ],
               )),
@@ -129,9 +128,9 @@ class _MovieCardState extends State<MovieCard>{
 
 class Error extends StatelessWidget{
   final String errorMessage;
-  final Function onRetryPressed;
+  final VoidCallback onRetryPressed;
 
-  const Error({Key key, this.errorMessage, this.onRetryPressed}): super(key: key);
+  const Error({required this.errorMessage, required this.onRetryPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +166,7 @@ class Error extends StatelessWidget{
 
 class Loading extends StatelessWidget {
   final String loadingMessage;
-  const Loading({Key key, this.loadingMessage}) : super(key: key);
+  const Loading({required this.loadingMessage});
   @override
   Widget build(BuildContext context) {
     return Center(

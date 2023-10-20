@@ -5,19 +5,24 @@ import 'package:movie_finder/networking/Response.dart';
 import 'package:movie_finder/repository/MovieDetailRepository.dart';
 
 class MovieDetailedBloc{
-  MovieDetailRepository _detailRepository;
-  StreamController _controller;
+  late MovieDetailRepository _detailRepository;
+  late StreamController<Response<MovieDetailedResponse>> _controller;
 
-  StreamSink<Response<MovieDetailedResponse>> get detailedDataSink => _controller.sink;
-  Stream<Response<MovieDetailedResponse>> get detailedDataStream => _controller.stream;
+  StreamSink<Response<MovieDetailedResponse>> get detailedDataSink =>
+      _controller.sink;
 
-  MovieDetailedBloc(String query){
+  Stream<Response<MovieDetailedResponse>> get detailedDataStream =>
+      _controller.stream;
+
+  MovieDetailedBloc(String? query){
     _controller = StreamController<Response<MovieDetailedResponse>>();
     _detailRepository = MovieDetailRepository();
-    fetchMovieDetails(query);
+    if(query != null){
+      fetchMovieDetails(query);
+    }
   }
 
-  fetchMovieDetails(String query) async{
+  Future<void> fetchMovieDetails(String query) async{
     detailedDataSink.add(Response.loading("Retrieving Data..."));
     try{
       MovieDetailedResponse search = await _detailRepository.fetchMovieDetails(query);
@@ -27,8 +32,8 @@ class MovieDetailedBloc{
     }
   }
 
-  dispose(){
-    _controller?.close();
+  void dispose(){
+    _controller.close();
   }
 
 }

@@ -12,7 +12,7 @@ class MovieScreen extends StatefulWidget {
   _MovieScreenState createState() => _MovieScreenState();
 }
 class _MovieScreenState extends State<MovieScreen> {
-  MovieBloc _bloc;
+  late MovieBloc _bloc;
   final myController = TextEditingController();
   bool isSearching = false;
   bool _isListening = false;
@@ -27,10 +27,10 @@ class _MovieScreenState extends State<MovieScreen> {
     return Scaffold(
       appBar: AppBar(
         title: !isSearching ? Text("Movie Finder"): TextField(
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.black),
           decoration: InputDecoration( prefixIcon: IconButton(
               icon: Icon(Icons.search),
-              color: Colors.white,
+              color: Colors.black,
               onPressed: () {
                 search = myController.text;
                 myController.clear();
@@ -42,7 +42,7 @@ class _MovieScreenState extends State<MovieScreen> {
                 });
               }),
               hintText: "Search for a Movie",
-              hintStyle: TextStyle(color: Colors.white)
+              hintStyle: TextStyle(color: Colors.black)
           ),
           controller: myController,
         ),
@@ -56,23 +56,20 @@ class _MovieScreenState extends State<MovieScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () => _bloc.fetchMovieList(),
-        child: StreamBuilder<Response<List<Movie>>>(
+        child: StreamBuilder<Response<List<Movie>>?>(
           stream: _bloc.movieListStream,
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              switch (snapshot.data.status) {
+            if (snapshot.hasData && snapshot.data != null) {
+              switch (snapshot.data!.status) {
                 case Status.LOADING:
-                  return Loading(loadingMessage: snapshot.data.message);
-                  break;
+                  return Loading(loadingMessage: snapshot.data!.message!);
                 case Status.COMPLETED:
-                  return MovieList(movieList: snapshot.data.data);
-                  break;
+                  return MovieList(movieList: snapshot.data!.data!);
                 case Status.ERROR:
                   return Error(
-                    errorMessage: snapshot.data.message,
+                    errorMessage: snapshot.data!.message!,
                     onRetryPressed: () => _bloc.fetchMovieList(),
                   );
-                  break;
               }
             }
             return Container();
@@ -99,7 +96,7 @@ class _MovieScreenState extends State<MovieScreen> {
 
 class MovieList extends StatelessWidget {
   final List<Movie> movieList;
-  const MovieList({Key key, this.movieList}) : super(key: key);
+  const MovieList({ required this.movieList});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -141,9 +138,8 @@ class MovieList extends StatelessWidget {
 
 class Error extends StatelessWidget {
   final String errorMessage;
-  final Function onRetryPressed;
-  const Error({Key key, this.errorMessage, this.onRetryPressed})
-      : super(key: key);
+  final VoidCallback onRetryPressed;
+  const Error({required this.errorMessage, required this.onRetryPressed});
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -174,7 +170,7 @@ class Error extends StatelessWidget {
 
 class Loading extends StatelessWidget {
   final String loadingMessage;
-  const Loading({Key key, this.loadingMessage}) : super(key: key);
+  const Loading({required this.loadingMessage});
   @override
   Widget build(BuildContext context) {
     return Center(

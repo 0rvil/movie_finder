@@ -13,7 +13,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen>{
-  SearchBloc _bloc;
+  late SearchBloc _bloc;
 
   @override
   void initState() {
@@ -28,22 +28,28 @@ class _SearchScreenState extends State<SearchScreen>{
        title: Text("Movie Finder"),
      ),
      body: RefreshIndicator(
-       onRefresh: () => _bloc.fetchSearchQuery(widget.selectedQuery),
+       onRefresh: () async {
+         if(widget.selectedQuery != null){
+           _bloc.fetchSearchQuery(widget.selectedQuery);
+         }
+       },
        child: StreamBuilder<Response<SearchResponse>>(
          stream: _bloc.searchDataStream,
          builder: (context,snapshot){
            if(snapshot.hasData){
-             switch (snapshot.data.status){
+             switch (snapshot.data!.status){
                case Status.LOADING:
-                 return Loading(loadingMessage: snapshot.data.message);
-                 break;
+                 return Loading(loadingMessage: snapshot.data!.message!);
                case Status.COMPLETED:
-                 return _SearchListState(searchResponse: snapshot.data.data);
-                 break;
+                 return _SearchListState(searchResponse: snapshot.data!.data!);
                case Status.ERROR:
-                 return Error(errorMessage: snapshot.data.message,
-                     onRetryPressed: ()=> _bloc.fetchSearchQuery(widget.selectedQuery), );
-                 break;
+                 return Error(errorMessage: snapshot.data!.message!,
+                     onRetryPressed: () async {
+                   if(widget.selectedQuery != null){
+                     await _bloc.fetchSearchQuery(widget.selectedQuery);
+                   }
+                },
+              );
              }
            }
            return Container();
@@ -65,18 +71,23 @@ class _SearchListState extends StatelessWidget{
   bool saved = false;
   bool watchList = false;
 
-  _SearchListState({Key key, this.searchResponse}) : super(key: key);
+  _SearchListState({required this.searchResponse});
 
   @override
   Widget build(BuildContext context) {
+    if (searchResponse == null) {
+      return Center(
+        child: Text('No search response available'),
+      );
+    }
 
-    final List<Results> list = searchResponse.results;
+    final List<Results> list = searchResponse.results!;
 
       return SingleChildScrollView(
         physics: ScrollPhysics(),
         child: (
           ListView.builder(
-            itemCount: searchResponse.results.length,
+            itemCount: searchResponse!.results!.length,
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemBuilder: (context, index) {
@@ -91,8 +102,8 @@ class _SearchListState extends StatelessWidget{
                       child: Column(
                         children: [
                           ListTile(
-                            title:Text(list[index].title),
-                            subtitle: Text(list[index].releaseDate),
+                            title:Text(list[index].title ?? ''),
+                            subtitle: Text(list[index].releaseDate ?? ''),
                           ),
                           SizedBox(
                             height: 300,
@@ -101,7 +112,7 @@ class _SearchListState extends StatelessWidget{
                           ),
                           Padding(
                             padding: const EdgeInsets.all(20.0),
-                            child: Text(list[index].overview, overflow: TextOverflow.ellipsis,),
+                            child: Text(list[index].overview ?? '', overflow: TextOverflow.ellipsis,),
                           ),
                         ],
                       ),
@@ -117,9 +128,9 @@ class _SearchListState extends StatelessWidget{
 
 class Error extends StatelessWidget{
   final String errorMessage;
-  final Function onRetryPressed;
+  final VoidCallback onRetryPressed;
 
-  const Error({Key key, this.errorMessage, this.onRetryPressed}): super(key: key);
+  const Error({required this.errorMessage, required this.onRetryPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +166,7 @@ class Error extends StatelessWidget{
 
 class Loading extends StatelessWidget {
   final String loadingMessage;
-  const Loading({Key key, this.loadingMessage}) : super(key: key);
+  const Loading({required this.loadingMessage});
   @override
   Widget build(BuildContext context) {
     return Center(

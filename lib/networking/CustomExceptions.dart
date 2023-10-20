@@ -17,7 +17,7 @@ class BadRequestException extends CustomException{
   BadRequestException([message]): super(message, "Invalid Request: ");
 }
 class UnauthorisedException extends CustomException {
-  UnauthorisedException([message]) : super(message, "Unauthorised: ");
+  UnauthorisedException([message]) : super(message, "Unauthorized: ");
 }
 
 class InvalidInputException extends CustomException {

@@ -6,30 +6,27 @@ import 'dart:async';
 
 class ApiProvider {
 
-  Future<dynamic> get(String url) async{
-    var responseJson;
+  Future<dynamic> get(String path) async{
     try{
-      final _baseUrl = Uri.https("m-finder-34.wl.r.appspot.com",'/$url');
-      final response = await http.get(_baseUrl);
-      responseJson = _response(response);
+      final baseUrl = Uri.https("m-finder-34.wl.r.appspot.com", path);
+      final response = await http.get(baseUrl);
+      return _handleResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }
-    print(responseJson);
-    return responseJson;
+
   }
 
-  dynamic _response(http.Response response) {
-    switch(response.statusCode){
+  dynamic _handleResponse(http.Response response) {
+    switch (response.statusCode) {
       case 200:
-        var responseJson = json.decode(response.body);
-        return responseJson;
+        return json.decode(response.body);
       case 400:
         throw BadRequestException(response.body.toString());
       case 403:
-          throw UnauthorisedException(response.body.toString());
+        throw UnauthorisedException(response.body.toString());
       default:
-        throw FetchDataException('Error occurred while communicating with the Server. StatusCode : ${response.statusCode}');
+        throw FetchDataException('Error occurred while communicating with the Server. StatusCode: ${response.statusCode}');
     }
   }
 }

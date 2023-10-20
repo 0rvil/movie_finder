@@ -4,21 +4,26 @@ import 'package:movie_finder/networking/Response.dart';
 import 'package:movie_finder/repository/SearchRepository.dart';
 
 class SearchBloc{
-  SearchRepository _searchRepository;
-  StreamController _searchDataController;
+  late SearchRepository _searchRepository;
+  late StreamController<Response<SearchResponse>> _searchDataController;
 
   StreamSink<Response<SearchResponse>> get searchDataSink => _searchDataController.sink;
-
   Stream<Response<SearchResponse>> get searchDataStream => _searchDataController.stream;
 
 
-  SearchBloc(String query){
+  SearchBloc(String? query){
     _searchDataController = StreamController<Response<SearchResponse>>();
     _searchRepository = SearchRepository();
-    fetchSearchQuery(query);
+    if (query != null) {
+      fetchSearchQuery(query);
+    }
   }
 
-  fetchSearchQuery(String query) async{
+  fetchSearchQuery(String? query) async{
+    if (query == null) {
+      searchDataSink.add(Response.error("Query is null"));
+      return;
+    }
     searchDataSink.add(Response.loading("Retrieving Search..."));
     try{
       SearchResponse search = await _searchRepository.fetchSearchQuery(query);
@@ -26,11 +31,11 @@ class SearchBloc{
     } catch(e){
       searchDataSink.add(Response.error(e.toString()));
       print(e);
-      print("Mission failed");
+      print("Query failed");
     }
   }
 
-  dispose(){
-    _searchDataController?.close();
+  void dispose(){
+    _searchDataController.close();
   }
 }

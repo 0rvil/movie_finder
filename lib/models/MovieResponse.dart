@@ -1,8 +1,8 @@
 class MovieResponse {
-  int page;
-  int totalResults;
-  int totalPages;
-  List<Movie> results;
+  int? page;
+  int? totalResults;
+  int? totalPages;
+  List<Movie>? results;
 
   MovieResponse({this.page, this.totalResults, this.totalPages, this.results});
 
@@ -11,9 +11,9 @@ class MovieResponse {
     totalResults = json['total_results'];
     totalPages = json['total_pages'];
     if (json['results'] != null) {
-      results = new List<Movie>();
+      results = <Movie>[];
       json['results'].forEach((v) {
-        results.add(new Movie.fromJson(v));
+        results!.add(new Movie.fromJson(v));
       });
     }
   }
@@ -24,78 +24,77 @@ class MovieResponse {
     data['total_results'] = this.totalResults;
     data['total_pages'] = this.totalPages;
     if (this.results != null) {
-      data['results'] = this.results.map((v) => v.toJson()).toList();
+      data['results'] = this.results!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Movie {
-  int voteCount;
-  int id;
-  bool video;
-  var voteAverage;
-  String title;
-  // double popularity;
-  String posterPath;
-  String originalLanguage;
-  String originalTitle;
-  List<int> genreIds;
-  String backdropPath;
-  bool adult;
-  String overview;
-  String releaseDate;
+  bool? adult;
+  String? backdropPath;
+  List<int>? genreIds;
+  int? id;
+  String? originalLanguage;
+  String? originalTitle;
+  String? overview;
+  num? popularity;
+  String? posterPath;
+  String? releaseDate;
+  String? title;
+  bool? video;
+  num? voteAverage;
+  int? voteCount;
 
   Movie(
-      {
-        this.voteCount,
+      {this.adult,
+        this.backdropPath,
+        this.genreIds,
         this.id,
-        this.video,
-        this.voteAverage,
-        this.title,
-        // this.popularity,
-        this.posterPath,
         this.originalLanguage,
         this.originalTitle,
-        this.genreIds,
-        this.backdropPath,
-        this.adult,
         this.overview,
-        this.releaseDate});
+        this.popularity,
+        this.posterPath,
+        this.releaseDate,
+        this.title,
+        this.video,
+        this.voteAverage,
+        this.voteCount});
 
   Movie.fromJson(Map<String, dynamic> json) {
-    voteCount = json['vote_count'];
+    adult = json['adult'];
+    backdropPath = json['backdrop_path'];
+    genreIds = json['genre_ids'].cast<int>();
     id = json['id'];
-    video = json['video'];
-    voteAverage = json['vote_average'];
-    title = json['title'];
-    // popularity = json['popularity'];
-    posterPath = json['poster_path'];
     originalLanguage = json['original_language'];
     originalTitle = json['original_title'];
-    genreIds = json['genre_ids'].cast<int>();
-    backdropPath = json['backdrop_path'];
-    adult = json['adult'];
     overview = json['overview'];
+    popularity = json['popularity'];
+    posterPath = json['poster_path'];
     releaseDate = json['release_date'];
+    title = json['title'];
+    video = json['video'];
+    voteAverage = json['vote_average'];
+    voteCount = json['vote_count'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['vote_count'] = this.voteCount;
+    data['adult'] = this.adult;
+    data['backdrop_path'] = this.backdropPath;
+    data['genre_ids'] = this.genreIds;
     data['id'] = this.id;
-    data['video'] = this.video;
-    data['vote_average'] = this.voteAverage;
-    data['title'] = this.title;
-    // data['popularity'] = this.popularity;
-    data['poster_path'] = this.posterPath;
     data['original_language'] = this.originalLanguage;
     data['original_title'] = this.originalTitle;
-    data['genre_ids'] = this.genreIds;
-    data['backdrop_path'] = this.backdropPath;
-    data['adult'] = this.adult;
     data['overview'] = this.overview;
+    data['popularity'] = this.popularity;
+    data['poster_path'] = this.posterPath;
     data['release_date'] = this.releaseDate;
+    data['title'] = this.title;
+    data['video'] = this.video;
+    data['vote_average'] = this.voteAverage;
+    data['vote_count'] = this.voteCount;
     return data;
   }
 }
